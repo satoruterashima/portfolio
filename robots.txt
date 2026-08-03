@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://satoruterashima.github.io/portfolio/sitemap.xml
+Host: satoruterashima.github.io
