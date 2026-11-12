@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#050912">
+  <meta name="description" content="SATO WorksのゲームUI強化版ポートフォリオ。HUD、起動演出、ターミナルログ、ネオン感を強めた experimental version.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="SATO Works / Tactical Portfolio">
+  <meta property="og:description" content="業務改善とAI導入を、ゲームUIの熱量で見せるポートフォリオ。">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>SATO Works / Tactical Portfolio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23050912'/%3E%3Cpath d='M18 18h28v28H18z' fill='none' stroke='%2370f0ff' stroke-width='2.5'/%3E%3Cpath d='M22 32h20M32 22v20' stroke='%23d8ff71' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" type="image/svg+xml">
+  <style>
+    :root{
+      --bg:#050912;--bg2:#09111f;--surface:#0b1322;--surface2:#0f182a;--surface3:#121e34;--line:#24324d;
+      --text:#ecf6ff;--muted:#8da1bf;--muted2:#577095;--lime:#d8ff71;--cyan:#70f0ff;--cyan2:#29b9ff;--magenta:#ff63d8;--red:#ff7272;
+      --ink:#0a1203;--header:rgba(5,9,18,.74);--panel-shadow:0 0 0 1px rgba(112,240,255,.06),0 0 34px rgba(41,185,255,.08),0 30px 90px rgba(0,0,0,.42);
+      --ease:cubic-bezier(.22,1,.36,1);--pointer-x:50vw;--pointer-y:16vh;--hero-x:0px;--hero-y:0px;
+    }
+    *,:before,:after{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:92px}
+    body{margin:0;min-height:100vh;overflow-x:hidden;color:var(--text);font-family:Inter,"Helvetica Neue",Arial,"Hiragino Sans",Meiryo,sans-serif;background:
+      radial-gradient(circle at 20% 10%, rgba(112,240,255,.13), transparent 25%),
+      radial-gradient(circle at 85% 18%, rgba(216,255,113,.09), transparent 24%),
+      radial-gradient(circle at 50% 120%, rgba(255,99,216,.08), transparent 38%),
+      linear-gradient(180deg,#050912,#07101d 38%,#050b15 100%);
+      -webkit-font-smoothing:antialiased}
+    body::before{content:"";position:fixed;inset:0;z-index:-3;pointer-events:none;background:
+      linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: 64px 64px;mask-image:linear-gradient(#000,transparent 90%)}
+    body::after{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:
+      radial-gradient(circle 180px at var(--pointer-x) var(--pointer-y), rgba(112,240,255,.12), transparent 72%),
+      radial-gradient(circle 220px at calc(var(--pointer-x) + 140px) calc(var(--pointer-y) + 40px), rgba(216,255,113,.08), transparent 74%);
+      opacity:.95}
+    a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer}
+    ::selection{background:var(--lime);color:var(--ink)} button:focus-visible,a:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
+    .skip-link{position:fixed;left:1rem;top:-4rem;background:var(--lime);color:var(--ink);padding:.8rem 1rem;z-index:250}.skip-link:focus{top:1rem}
+    .container{width:min(1400px,calc(100% - 72px));margin-inline:auto}.section{padding-block:100px;position:relative}
+    .noise,.scanlines,.vignette{position:fixed;inset:0;pointer-events:none}
+    .noise{z-index:180;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='%23ffffff'%3E%3Ccircle cx='8' cy='10' r='1'/%3E%3Ccircle cx='34' cy='41' r='1'/%3E%3Ccircle cx='78' cy='20' r='1'/%3E%3Ccircle cx='120' cy='50' r='1'/%3E%3Ccircle cx='50' cy='88' r='1'/%3E%3Ccircle cx='104' cy='112' r='1'/%3E%3Ccircle cx='18' cy='118' r='1'/%3E%3C/g%3E%3C/svg%3E")}
+    .scanlines{z-index:181;background:linear-gradient(rgba(255,255,255,.022) 50%, rgba(0,0,0,0) 50%);background-size:100% 4px;mix-blend-mode:soft-light;opacity:.36}
+    .vignette{z-index:179;box-shadow:inset 0 0 120px rgba(0,0,0,.42),inset 0 0 260px rgba(0,0,0,.38)}
+    .page-progress{position:fixed;inset:0 0 auto;height:2px;z-index:220;background:transparent;pointer-events:none}.page-progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--lime),var(--magenta));box-shadow:0 0 18px rgba(112,240,255,.5)}
+
+    .boot-overlay{position:fixed;inset:0;background:radial-gradient(circle at center, rgba(19,35,59,.72), rgba(5,9,18,.98));display:grid;place-items:center;z-index:500;overflow:hidden}
+    .boot-overlay.hidden{opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s ease}
+    .boot-overlay::after{content:"";position:absolute;left:0;right:0;top:50%;height:2px;opacity:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.95),transparent);transform:translateY(-50%) scaleX(0);pointer-events:none}
+    .boot-overlay.closing::after{animation:tvLine .28s ease forwards}
+    .boot-window{width:min(820px,calc(100% - 40px));padding:30px 30px 26px;border:1px solid rgba(112,240,255,.18);background:linear-gradient(180deg,rgba(11,19,34,.95),rgba(6,12,22,.96));box-shadow:var(--panel-shadow);position:relative;transform-origin:center center}
+    .boot-overlay.closing .boot-window{animation:tvOffWindow .28s cubic-bezier(.55,.05,.675,.19) forwards}
+    .boot-window::before,.boot-window::after{content:"";position:absolute;width:26px;height:26px;border-color:var(--cyan);border-style:solid;opacity:.9}.boot-window::before{left:10px;top:10px;border-width:2px 0 0 2px}.boot-window::after{right:10px;bottom:10px;border-width:0 2px 2px 0}
+    .boot-title{display:flex;justify-content:space-between;align-items:center;color:var(--muted2);font:800 11px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.16em;gap:10px}
+    .boot-headline{font-size:clamp(34px,6vw,72px);letter-spacing:-.08em;margin:24px 0 12px;font-weight:950}.boot-headline span{color:var(--lime)}
+    .boot-sub{margin:0;color:var(--muted);line-height:1.9;font-size:14px;max-width:60ch}.boot-tipline{margin-top:16px;padding:12px 14px;border:1px solid rgba(112,240,255,.12);background:rgba(255,255,255,.02);color:var(--text);font-size:13px;line-height:1.8}
+    .boot-tipline b{color:var(--lime)}
+    .boot-bar{margin-top:26px;height:12px;border:1px solid rgba(112,240,255,.18);padding:2px;background:rgba(255,255,255,.02)}.boot-bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--lime));box-shadow:0 0 18px rgba(112,240,255,.4)}
+    .boot-log{display:grid;gap:10px;margin-top:20px;font:700 13px/1.45 ui-monospace,Consolas,monospace;color:var(--muted2)}.boot-log div{opacity:.38;transition:opacity .25s ease,color .25s ease}.boot-log div.active{opacity:1;color:var(--text)}.boot-log b{color:var(--cyan)}
+    .boot-actions{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:22px;flex-wrap:wrap}.boot-tip{color:var(--muted2);font:700 11px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.12em}.boot-skip{border:1px solid rgba(216,255,113,.22);background:rgba(216,255,113,.08);color:var(--lime);padding:12px 16px;font-weight:900;letter-spacing:.1em}
+
+    .site-header{position:sticky;top:0;z-index:200;background:var(--header);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(112,240,255,.09)}
+    .header-inner{height:74px;display:flex;align-items:center;gap:16px}.wordmark{display:inline-flex;align-items:center;gap:12px;font-weight:950;letter-spacing:-.035em}.wm-icon{width:24px;height:24px;border:1px solid rgba(112,240,255,.34);position:relative}.wm-icon::before,.wm-icon::after{content:"";position:absolute;background:var(--cyan)}.wm-icon::before{inset:3px 10px}.wm-icon::after{inset:10px 3px}.wordmark em{font-style:normal;color:var(--lime)}.wordmark span:last-child{font-size:16px}
+    .desktop-nav{display:flex;gap:12px;margin-left:auto}.desktop-nav a{position:relative;padding:12px 14px 11px;border:1px solid rgba(112,240,255,.09);background:rgba(255,255,255,.015);font-size:11px;letter-spacing:.15em;color:var(--muted);font-weight:850;transition:all .22s var(--ease)}.desktop-nav a.active,.desktop-nav a:hover{color:var(--text);border-color:rgba(216,255,113,.18);box-shadow:inset 0 0 0 1px rgba(112,240,255,.12),0 0 20px rgba(112,240,255,.05)}.desktop-nav a::before,.desktop-nav a::after{content:"";position:absolute;width:10px;height:10px;border-color:transparent;border-style:solid;transition:border-color .2s}.desktop-nav a::before{left:4px;top:4px;border-width:1.5px 0 0 1.5px}.desktop-nav a::after{right:4px;bottom:4px;border-width:0 1.5px 1.5px 0}.desktop-nav a.active::before,.desktop-nav a.active::after,.desktop-nav a:hover::before,.desktop-nav a:hover::after{border-color:var(--cyan)}
+    .desktop-nav small{color:var(--muted2);margin-left:6px}.header-actions{display:flex;align-items:center;gap:10px;margin-left:12px}.icon-button{width:42px;height:42px;border:1px solid rgba(112,240,255,.12);background:rgba(255,255,255,.018);color:var(--text);display:grid;place-items:center;transition:transform .2s,border-color .2s}.icon-button:hover{transform:translateY(-2px);border-color:rgba(216,255,113,.18)}.icon-button svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.action-link{padding:12px 16px;border:1px solid rgba(216,255,113,.2);background:linear-gradient(135deg,rgba(112,240,255,.12),rgba(216,255,113,.1));font-size:11px;letter-spacing:.13em;font-weight:900;box-shadow:var(--panel-shadow);transition:transform .2s var(--ease)}.action-link:hover{transform:translateY(-2px)}.mobile-menu-button{display:none;position:relative}.mobile-menu-button span{position:absolute;width:16px;height:1.5px;background:currentColor;transition:transform .2s}.mobile-menu-button span:first-child{transform:translateY(-4px)}.mobile-menu-button span:last-child{transform:translateY(4px)}.mobile-menu-button[aria-expanded=true] span:first-child{transform:rotate(45deg)}.mobile-menu-button[aria-expanded=true] span:last-child{transform:rotate(-45deg)}.mobile-nav{padding:10px 20px 20px;background:rgba(5,9,18,.95);border-top:1px solid rgba(112,240,255,.08)}.mobile-nav:not([hidden]){display:grid}.mobile-nav a{padding:14px 0;border-bottom:1px solid rgba(112,240,255,.07);font-weight:700}
+
+    .hud,.card,.hero-left,.hero-right,.data-panel,.contact-panel{position:relative;background:linear-gradient(180deg,rgba(10,18,32,.92),rgba(8,14,24,.97));border:1px solid rgba(112,240,255,.11);box-shadow:var(--panel-shadow);overflow:hidden}
+    .hud::before,.card::before,.hero-left::before,.hero-right::before,.data-panel::before,.contact-panel::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.03),transparent 24%)}
+    .hud::after,.card::after,.hero-left::after,.hero-right::after,.data-panel::after,.contact-panel::after{content:"";position:absolute;inset:14px;border:1px solid rgba(112,240,255,.07);pointer-events:none;clip-path:polygon(0 12px,12px 0,calc(100% - 12px) 0,100% 12px,100% calc(100% - 12px),calc(100% - 12px) 100%,12px 100%,0 calc(100% - 12px))}
+
+    .hero{padding-top:58px;padding-bottom:30px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:stretch}.hero-left,.hero-right{padding:26px;border-radius:0}
+    .section-kicker{display:flex;align-items:center;gap:10px;font:800 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em;color:var(--muted)}.status-led{width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 15px rgba(216,255,113,.75)}
+    .hero h1{font-size:clamp(42px,5.5vw,86px);line-height:1.03;letter-spacing:-.09em;margin:24px 0 18px;font-weight:950}.hero h1 .stroke{color:transparent;-webkit-text-stroke:1px rgba(236,246,255,.78)}.hero h1 .accent{color:var(--lime)}
+    .hero-lede{margin:0;color:var(--muted);line-height:1.95;font-size:15px;max-width:42rem}.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.button{display:inline-flex;align-items:center;justify-content:space-between;gap:18px;padding:0 18px;min-height:54px;border:1px solid rgba(112,240,255,.12);font-size:13px;font-weight:850;letter-spacing:.02em;transition:transform .2s var(--ease),border-color .2s var(--ease),background .2s var(--ease)}.button:hover{transform:translateY(-2px)}.button.primary{background:linear-gradient(135deg,var(--lime),#efffb1);border-color:transparent;color:var(--ink)}.button.secondary{background:rgba(255,255,255,.02)}
+    .hero-tags{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}.hero-tags span{padding:9px 11px;border:1px solid rgba(112,240,255,.11);background:rgba(255,255,255,.02);font:700 11px/1 ui-monospace,Consolas,monospace;color:var(--muted)}
+    .hero-telemetry{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}.telemetry{padding:14px;border:1px solid rgba(112,240,255,.1);background:rgba(255,255,255,.02)}.telemetry span{display:flex;justify-content:space-between;color:var(--muted2);font:800 10px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.15em}.telemetry b{display:block;margin-top:14px;font-size:30px;letter-spacing:-.04em}.telemetry small{display:block;margin-top:6px;color:var(--muted);font-size:12px}
+
+    .right-head{display:flex;justify-content:space-between;align-items:center;color:var(--muted2);font:800 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.15em}.tactical-frame{position:relative;height:520px;margin-top:16px;border:1px solid rgba(112,240,255,.11);background:linear-gradient(180deg,#08111e,#0a1321 62%,#09111d);overflow:hidden}
+    .tactical-frame::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at center, rgba(112,240,255,.08), transparent 52%),linear-gradient(180deg,transparent 0 47%,rgba(112,240,255,.1) 50%,transparent 53%);background-size:100% 100%,100% 180%;animation:scan 7s linear infinite}
+    .tactical-grid{position:absolute;inset:7%;border:1px solid rgba(112,240,255,.12);background:linear-gradient(rgba(112,240,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(112,240,255,.08) 1px,transparent 1px);background-size:38px 38px}.orbit-ring{position:absolute;border-radius:50%;border:1px dashed rgba(216,255,113,.18);animation:spin 18s linear infinite}.orbit-ring.r1{inset:8%}.orbit-ring.r2{inset:18%;animation-duration:14s;animation-direction:reverse}.orbit-ring.r3{inset:30%;animation-duration:10s}
+    .target-core{position:absolute;inset:50%;width:min(64%,320px);aspect-ratio:1/1;transform:translate(-50%,-50%) rotate(-6deg) translate3d(calc(var(--hero-x) * .65),calc(var(--hero-y) * .65),0);transition:transform .14s linear;border:1px solid rgba(216,255,113,.22);background:linear-gradient(145deg,#132035,#0a1320 68%);box-shadow:0 0 0 1px rgba(112,240,255,.08) inset,0 0 60px rgba(41,185,255,.08),0 26px 70px rgba(0,0,0,.44);padding:18px}
+    .target-core::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.05),transparent 26%)}
+    .corner,.corner::before,.corner::after{position:absolute;border-color:var(--cyan);border-style:solid;content:""}.corner{inset:0;pointer-events:none}.corner::before{left:10px;top:10px;width:24px;height:24px;border-width:2px 0 0 2px}.corner::after{right:10px;bottom:10px;width:24px;height:24px;border-width:0 2px 2px 0}
+    .lock-lines{position:absolute;inset:-6%;pointer-events:none}.lock-lines i{position:absolute;display:block;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.7}.lock-lines i:nth-child(1){left:0;right:0;top:28%;height:1px}.lock-lines i:nth-child(2){left:0;right:0;bottom:28%;height:1px}.lock-lines i:nth-child(3){top:0;bottom:0;left:28%;width:1px;background:linear-gradient(180deg,transparent,var(--lime),transparent)}.lock-lines i:nth-child(4){top:0;bottom:0;right:28%;width:1px;background:linear-gradient(180deg,transparent,var(--lime),transparent)}
+    .core-head{display:flex;justify-content:space-between;align-items:center;color:#9cc8cf;font:800 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.15em}.core-body{padding-top:16px}.core-body .over{font-size:10px;letter-spacing:.15em;color:var(--muted2);font-weight:800}.core-body h2{font-size:58px;line-height:.96;letter-spacing:-.08em;margin:14px 0 18px}.core-body h2 span{color:var(--lime)}.progress-stack{display:grid;gap:8px}.progress-stack i{display:block;height:10px;background:rgba(255,255,255,.07);position:relative;overflow:hidden}.progress-stack i::before{content:"";position:absolute;inset:0;width:var(--w);background:linear-gradient(90deg,var(--cyan),var(--lime));box-shadow:0 0 14px rgba(112,240,255,.24)}
+    .core-footer{margin-top:18px;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font:700 10px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.14em}
+    .mini-data{position:absolute;min-width:130px;padding:12px 12px 11px;border:1px solid rgba(112,240,255,.11);background:rgba(5,10,18,.88);box-shadow:var(--panel-shadow);transform:translate3d(calc(var(--hero-x) * var(--mx)),calc(var(--hero-y) * var(--my)),0);transition:transform .14s linear}.mini-data span{display:block;color:var(--muted2);font:800 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em}.mini-data b{display:block;margin-top:10px;font-size:26px;letter-spacing:-.05em}.mini-data small{display:block;margin-top:5px;color:var(--muted);font-size:11px}.mini-data.a{top:18px;left:18px;--mx:-.22;--my:-.15}.mini-data.b{top:82px;right:18px;--mx:.18;--my:-.12}.mini-data.c{bottom:104px;left:22px;--mx:-.16;--my:.12}.mini-data.d{bottom:22px;right:22px;--mx:.2;--my:.16}
+    .terminal-box{margin-top:16px;padding:16px;border:1px solid rgba(112,240,255,.1);background:rgba(255,255,255,.015)}.terminal-box h3{margin:0;color:var(--muted);font:800 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.15em}.terminal-log{display:grid;gap:8px;margin-top:14px;color:#9ac3d0;font:700 12px/1.55 ui-monospace,Consolas,monospace;min-height:124px}.terminal-log b{color:var(--lime)}.terminal-log em{font-style:normal;color:var(--cyan)}
+
+    .dual-data{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;margin-top:18px}.data-panel{padding:22px}.data-panel h3{margin:0;color:var(--muted);font:800 12px/1 ui-monospace,Consolas,monospace;letter-spacing:.16em}.list-board{display:grid;gap:12px;margin-top:18px}.board-item{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;padding:14px;border:1px solid rgba(112,240,255,.1);background:rgba(255,255,255,.02);transition:transform .2s var(--ease),border-color .2s var(--ease)}.board-item:hover{transform:translateY(-2px);border-color:rgba(216,255,113,.18)}.board-item .num{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(216,255,113,.18);color:var(--lime);font:800 12px/1 ui-monospace,Consolas,monospace;background:rgba(216,255,113,.07)}.board-item b{display:block;font-size:16px}.board-item p{margin:4px 0 0;color:var(--muted);line-height:1.75;font-size:13px}.board-item small{color:var(--muted2);font:700 10px/1.3 ui-monospace,Consolas,monospace;letter-spacing:.14em}
+    .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}.stat-cell{padding:14px;border:1px solid rgba(112,240,255,.1);background:rgba(255,255,255,.02)}.stat-cell span{display:block;color:var(--muted2);font:800 10px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.15em}.stat-cell b{display:block;margin-top:12px;font-size:28px}.stat-cell small{display:block;margin-top:6px;color:var(--muted);font-size:12px}
+
+    .section-head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:28px}.section-head h2{margin:0;font-size:clamp(34px,4.2vw,58px);letter-spacing:-.07em}.section-head p{margin:0;color:var(--muted);line-height:1.85;max-width:48ch}.section-index{font:800 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--muted2);margin-bottom:12px}
+    .filters{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.filter{position:relative;padding:11px 15px;border:1px solid rgba(112,240,255,.11);background:rgba(255,255,255,.02);font:800 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--muted);transition:all .2s var(--ease)}.filter.active,.filter:hover{color:var(--text);border-color:rgba(216,255,113,.18);background:rgba(216,255,113,.06);box-shadow:0 0 18px rgba(216,255,113,.05)}
+
+    .project-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}.card{transition:transform .26s var(--ease),border-color .26s var(--ease),box-shadow .26s var(--ease),opacity .26s var(--ease),max-height .26s var(--ease)}.expandable-card{cursor:pointer}.card:hover{transform:translateY(-6px);border-color:rgba(216,255,113,.18);box-shadow:0 0 0 1px rgba(112,240,255,.09) inset,0 24px 70px rgba(0,0,0,.48),0 0 30px rgba(112,240,255,.08)}.card.large{grid-column:span 6}.card.small{grid-column:span 3}.card[hidden]{display:none!important}
+    .card-top{display:flex;justify-content:space-between;align-items:center;padding:18px 18px 0}.card-id{color:var(--muted2);font:800 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em}.card-status{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid rgba(112,240,255,.1);background:rgba(255,255,255,.03);font:800 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}.status-dot{width:8px;height:8px;border-radius:50%}.status-dot.live{background:var(--lime);box-shadow:0 0 12px rgba(216,255,113,.72)}.status-dot.build{background:var(--cyan);box-shadow:0 0 12px rgba(112,240,255,.72)}
+    .card-preview{position:relative;height:280px;margin:14px 18px 0;border:1px solid rgba(112,240,255,.1);background:linear-gradient(180deg,#09121e,#0e1624);overflow:hidden}.card-preview::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 0 48%,rgba(112,240,255,.08) 50%,transparent 52%);background-size:100% 190%;animation:scan 8s linear infinite}
+    .card-body{display:flex;justify-content:space-between;gap:16px;padding:20px 18px 18px;align-items:flex-start}.card-copy{flex:1;min-width:0}.card-type{margin:0 0 8px;color:var(--cyan);font:800 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em}.card h3{margin:0;font-size:24px;letter-spacing:-.05em}.card p{margin:10px 0 0;color:var(--muted);line-height:1.85;font-size:14px}.tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}.tags span{padding:7px 10px;border:1px solid rgba(112,240,255,.1);background:rgba(255,255,255,.025);font:700 11px/1 ui-monospace,Consolas,monospace;color:var(--muted)}.card-actions{display:flex;flex-direction:column;gap:10px;align-items:stretch;flex-shrink:0}.open-link,.detail-toggle{min-width:48px;height:48px;display:grid;place-items:center;border:1px solid rgba(112,240,255,.1);font-size:22px;transition:all .2s var(--ease);background:rgba(255,255,255,.02);color:var(--text)}.open-link:hover,.detail-toggle:hover{color:var(--lime);border-color:rgba(216,255,113,.18);background:rgba(216,255,113,.06)}.detail-toggle{width:auto;padding:0 14px;font-size:11px;font-weight:900;letter-spacing:.14em}.detail-toggle .toggle-close{display:none}.card.is-open .detail-toggle .toggle-open{display:none}.card.is-open .detail-toggle .toggle-close{display:inline}.card.is-open{border-color:rgba(216,255,113,.2)}
+    .card-detail{border-top:1px solid rgba(112,240,255,.1);padding:0 18px 18px;max-height:0;opacity:0;overflow:hidden;transition:max-height .34s var(--ease),opacity .22s ease,padding-top .2s ease}.card.is-open .card-detail{max-height:460px;opacity:1;padding-top:16px}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.detail-block{padding:14px;border:1px solid rgba(112,240,255,.09);background:rgba(255,255,255,.02)}.detail-block span{display:block;color:var(--muted2);font:800 10px/1.3 ui-monospace,Consolas,monospace;letter-spacing:.14em}.detail-block b{display:block;margin-top:8px;font-size:14px;line-height:1.65;color:var(--text)}.detail-note{margin-top:14px;color:var(--muted);font-size:13px;line-height:1.85}
+    .targeted::after{content:"ACTIVE TARGET";position:absolute;left:14px;bottom:14px;padding:7px 10px;background:rgba(216,255,113,.08);border:1px solid rgba(216,255,113,.18);color:var(--lime);font:800 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;z-index:5}
+    .att-ui{position:absolute;inset:16px;display:grid;grid-template-columns:68px 1fr;gap:14px}.att-rail{padding:12px;background:rgba(255,255,255,.02);border:1px solid rgba(112,240,255,.1);display:grid;justify-items:center;gap:10px}.att-rail b{width:32px;height:32px;display:grid;place-items:center;border:1px solid rgba(216,255,113,.18);color:var(--lime)}.att-rail i{display:block;width:20px;height:20px;background:rgba(255,255,255,.06)}.att-rail i.active{background:linear-gradient(135deg,var(--cyan),var(--lime));box-shadow:0 0 20px rgba(112,240,255,.18)}.att-main{padding:16px;border:1px solid rgba(112,240,255,.1);background:rgba(255,255,255,.02)}.att-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted)}.avatar{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(112,240,255,.18);background:rgba(112,240,255,.08)}.att-main h4{font-size:28px;letter-spacing:-.05em;margin:14px 0 12px}.att-boxes{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.att-box{padding:12px;border:1px solid rgba(112,240,255,.08);background:rgba(255,255,255,.02)}.att-box span{display:block;color:var(--muted2);font:800 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em}.att-box b{display:block;margin-top:8px;font-size:28px}.att-chart{display:flex;gap:8px;align-items:end;height:78px;margin-top:18px}.att-chart i{display:block;flex:1;height:var(--h);background:linear-gradient(180deg,var(--cyan),var(--lime));box-shadow:0 0 18px rgba(112,240,255,.18)}
+    .invoice-ui{position:absolute;inset:0;display:grid;place-items:center}.invoice-sheet{width:min(76%,330px);background:#f6f8fe;color:#19253a;padding:18px;box-shadow:0 26px 60px rgba(0,0,0,.28);position:relative}.invoice-sheet .head{display:flex;justify-content:space-between;align-items:center}.invoice-sheet .head b{font-size:28px;letter-spacing:-.05em}.invoice-sheet .head span{color:#6d7f99;font:700 11px ui-monospace,Consolas,monospace}.invoice-sheet .meta{margin-top:14px;padding-top:10px;border-top:1px solid #d9e1ee;color:#62728a;font-size:12px;line-height:1.7}.invoice-table{margin-top:16px;border:1px solid #dbe4f0}.invoice-row{display:grid;grid-template-columns:1fr auto;padding:10px 12px;font-size:13px}.invoice-row:first-child{background:#eef3fb;font-weight:800}.invoice-row + .invoice-row{border-top:1px solid #e7edf5}.invoice-total{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid #dde5f0;font-weight:900}.invoice-total b{font-size:24px}.invoice-stamp{position:absolute;right:-12px;bottom:24px;transform:rotate(-10deg);padding:10px 12px;border:3px solid #54af62;color:#54af62;font-weight:900;background:rgba(255,255,255,.84)}
+    .andw-ui,.pab-ui{position:absolute;inset:16px;border:1px solid rgba(112,240,255,.1);background:rgba(255,255,255,.02);overflow:hidden}.andw-ui{display:grid;grid-template-columns:88px 1fr}.andw-side{padding:16px;border-right:1px solid rgba(112,240,255,.1)}.andw-side b{display:block;font-size:20px}.andw-side b span{color:var(--lime)}.andw-side small{display:block;margin-top:6px;color:var(--muted2);font:700 10px ui-monospace,Consolas,monospace}.andw-side i{display:block;height:8px;background:rgba(255,255,255,.06);margin-top:14px}.andw-main{padding:18px}.andw-top{display:flex;justify-content:space-between;color:var(--muted2);font:700 10px ui-monospace,Consolas,monospace}.andw-main h4{font-size:30px;letter-spacing:-.06em;line-height:1.1;margin:18px 0}.line,.block{background:rgba(255,255,255,.07)}.line{height:10px}.line.short{width:60%;margin-top:12px}.block{height:72px;margin-top:18px}
+    .pab-ui{display:grid;place-items:center}.flow{display:flex;align-items:center;gap:12px}.node{min-width:96px;padding:15px 13px;border:1px solid rgba(112,240,255,.1);background:linear-gradient(180deg,#13223a,#09121f);font-size:18px;font-weight:900;text-align:center}.node span{display:block;margin-top:6px;font-size:10px;color:var(--muted2);letter-spacing:.14em}.connector{width:28px;height:2px;background:linear-gradient(90deg,var(--cyan),var(--lime));position:relative}.connector::after{content:"";position:absolute;right:0;top:50%;width:8px;height:8px;border-top:2px solid var(--lime);border-right:2px solid var(--lime);transform:translateY(-50%) rotate(45deg)}.pab-foot{position:absolute;left:18px;right:18px;bottom:16px;display:flex;justify-content:space-between;color:var(--muted2);font:700 10px ui-monospace,Consolas,monospace;letter-spacing:.12em}
+
+    .work-note{margin-top:18px;color:var(--muted2);font-size:12px;line-height:1.8}.skill-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.skill-card{padding:24px}.skill-card .icon{width:44px;height:44px;display:grid;place-items:center;border:1px solid rgba(216,255,113,.16);background:rgba(216,255,113,.06);color:var(--lime);font-size:22px}.skill-card .code{margin-top:16px;color:var(--muted2);font:800 11px ui-monospace,Consolas,monospace;letter-spacing:.12em}.skill-card h3{margin:10px 0 12px;font-size:24px;letter-spacing:-.04em}.skill-card p{margin:0;color:var(--muted);line-height:1.8}.skill-card .meta{margin-top:18px;color:var(--cyan);font:700 11px ui-monospace,Consolas,monospace;letter-spacing:.12em}
+    .lower-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:18px;margin-top:18px}.tool-cloud{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.tool-cloud span{padding:8px 10px;border:1px solid rgba(112,240,255,.1);background:rgba(255,255,255,.02);font:700 11px ui-monospace,Consolas,monospace;color:var(--muted)}
+    .radar-panel{overflow:visible}.radar-wrap{position:relative;display:grid;place-items:center;min-height:340px;overflow:visible;padding:18px 0}.radar{position:relative;aspect-ratio:1/1;width:min(100%,320px);overflow:visible;--radar-angle:0deg}.radar-core{position:absolute;inset:6%;border:1px solid rgba(112,240,255,.14);border-radius:50%;background:radial-gradient(circle, rgba(112,240,255,.1), transparent 60%)}.radar-core::before,.radar-core::after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(112,240,255,.15)}.radar-core::before{inset:20%}.radar-core::after{inset:38%}.radar-frame{position:absolute;inset:-2%;border:1px solid rgba(112,240,255,.11)}.radar-sector{position:absolute;inset:6%;border-radius:50%;overflow:hidden;transform:rotate(var(--radar-angle));filter:drop-shadow(0 0 18px rgba(216,255,113,.12))}.radar-sector::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 82deg, rgba(216,255,113,.20) 0deg 28deg, transparent 28deg 360deg)}.radar-axis-x,.radar-axis-y{position:absolute;background:rgba(112,240,255,.16)}.radar-axis-x{left:10%;right:10%;top:50%;height:1px}.radar-axis-y{top:10%;bottom:10%;left:50%;width:1px}.radar-dot{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--lime);box-shadow:0 0 14px rgba(216,255,113,.72);transition:transform .12s ease,opacity .12s ease,box-shadow .12s ease}.radar-dot.is-ping{animation:radarPing 1.05s linear 1}.radar-dot.one{top:24%;left:64%}.radar-dot.two{top:50%;left:20%;background:var(--cyan);box-shadow:0 0 14px rgba(112,240,255,.72)}.radar-dot.two.is-ping{box-shadow:0 0 18px rgba(112,240,255,.95)}.radar-dot.three{top:72%;left:58%}
+
+    .about-grid{display:grid;grid-template-columns:.96fr 1.04fr;gap:18px}.about-panel{padding:26px}.badge{display:inline-flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid rgba(216,255,113,.18);background:rgba(216,255,113,.06);color:var(--lime);font:800 11px ui-monospace,Consolas,monospace;letter-spacing:.13em}.about-panel h2{font-size:clamp(34px,4.2vw,56px);line-height:1.08;letter-spacing:-.07em;margin:18px 0}.about-panel p{margin:0 0 16px;color:var(--muted);line-height:1.92}.meta-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}.meta-cell{padding:14px;border:1px solid rgba(112,240,255,.1);background:rgba(255,255,255,.02)}.meta-cell span{display:block;color:var(--muted2);font:800 10px ui-monospace,Consolas,monospace;letter-spacing:.14em}.meta-cell b{display:block;margin-top:10px;font-size:18px;line-height:1.45}.timeline{display:grid;gap:12px}.step{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:14px;border:1px solid rgba(112,240,255,.1);background:rgba(255,255,255,.02)}.step .n{width:40px;height:40px;display:grid;place-items:center;border:1px solid rgba(112,240,255,.14);background:rgba(112,240,255,.06);color:var(--cyan);font:800 12px ui-monospace,Consolas,monospace}.step b{display:block;font-size:16px;margin-bottom:6px}.step p{margin:0;color:var(--muted);font-size:13px;line-height:1.8}
+
+    .contact-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:18px}.contact-panel{padding:30px}.contact-title{font-size:clamp(40px,5vw,72px);line-height:1.02;letter-spacing:-.08em;margin:16px 0 18px}.contact-title em{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(236,246,255,.78)}.contact-panel p{margin:0;color:var(--muted);line-height:1.9}.contact-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.contact-side h3{margin:0;color:var(--muted);font:800 11px ui-monospace,Consolas,monospace;letter-spacing:.16em}.mail-link{display:block;margin-top:18px;font-size:24px;letter-spacing:-.04em;font-weight:900;word-break:break-all}.contact-list{display:grid;gap:12px;margin-top:18px}.contact-list div{padding:13px;border:1px solid rgba(112,240,255,.1);background:rgba(255,255,255,.02)}.contact-list span{display:block;color:var(--muted2);font:800 10px ui-monospace,Consolas,monospace;letter-spacing:.14em}.contact-list b{display:block;margin-top:7px;font-size:14px;line-height:1.6}
+    .site-footer{padding:30px 0 46px}.footer-inner{display:flex;justify-content:space-between;gap:20px;align-items:center;color:var(--muted)}.footer-right{display:flex;gap:18px;flex-wrap:wrap}.footer-code{color:var(--muted2);font:700 10px ui-monospace,Consolas,monospace;letter-spacing:.14em}
+
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity .8s var(--ease),transform .8s var(--ease)}.reveal.is-visible{opacity:1;transform:translateY(0)}.count[data-value]{visibility:hidden}.count.is-ready{visibility:visible}
+
+    @keyframes scan{from{background-position:0 -180%}to{background-position:0 180%}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes tvOffWindow{0%{opacity:1;transform:scale(1)}58%{opacity:1;transform:scaleY(.04) scaleX(1.02);filter:brightness(1.55)}100%{opacity:0;transform:scaleY(.04) scaleX(0);filter:brightness(2)}}
+    @keyframes tvLine{0%{opacity:0;transform:translateY(-50%) scaleX(0)}18%{opacity:1;transform:translateY(-50%) scaleX(1)}100%{opacity:0;transform:translateY(-50%) scaleX(0)}}
+    @keyframes radarPing{0%,25%,50%,75%,100%{opacity:1}12.5%,37.5%,62.5%,87.5%{opacity:.12}}
+
+    @media (max-width:1120px){.container{width:min(100% - 50px,1400px)}.hero,.dual-data,.lower-grid,.about-grid,.contact-grid{grid-template-columns:1fr}.card.large{grid-column:span 12}.card.small{grid-column:span 6}.skill-grid{grid-template-columns:1fr 1fr}}
+    @media (max-width:840px){.container{width:calc(100% - 32px)}.section{padding-block:74px}.header-inner{height:66px}.desktop-nav,.action-link{display:none}.mobile-menu-button{display:grid}.hero{padding-top:38px;grid-template-columns:1fr}.hero-left,.hero-right,.data-panel,.contact-panel{padding:22px}.hero h1{font-size:clamp(38px,10vw,64px)}.hero-telemetry{grid-template-columns:1fr}.tactical-frame{height:440px}.target-core{width:min(70%,290px)}.core-body h2{font-size:46px}.card.small{grid-column:span 12}.skill-grid{grid-template-columns:1fr}.section-head{flex-direction:column;align-items:flex-start}.detail-grid{grid-template-columns:1fr}}
+    @media (max-width:560px){.container{width:calc(100% - 24px)}.hero h1{font-size:32px}.hero-lede{font-size:13px}.button{width:100%}.tactical-frame{height:375px}.target-core{width:min(80%,244px);padding:14px}.core-body h2{font-size:34px}.mini-data{min-width:112px;padding:10px}.mini-data b{font-size:20px}.mini-data.a{top:10px;left:10px}.mini-data.b{top:56px;right:10px}.mini-data.c{bottom:88px;left:10px}.mini-data.d{right:10px;bottom:12px}.card-preview{height:246px}.meta-grid,.stat-grid{grid-template-columns:1fr}.footer-inner{flex-direction:column;align-items:flex-start}.card-actions{flex-direction:row} .boot-overlay{display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:max(12px, env(safe-area-inset-top)) 12px calc(84px + env(safe-area-inset-bottom))}
+      .boot-window{width:100%;margin:auto 0;padding:24px 20px 22px}
+      .boot-overlay .boot-skip{position:fixed;z-index:510;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));min-height:48px;padding:12px 20px;background:#172b1d;border:1px solid var(--lime);box-shadow:0 0 18px rgba(216,255,113,.2);color:var(--lime)}
+      .boot-overlay.closing .boot-skip{opacity:0;pointer-events:none}
+      .boot-title{flex-direction:column;align-items:flex-start}.radar-wrap{min-height:280px}}
+    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}.boot-overlay{display:none}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">本文へ移動</a>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="page-progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+  <div class="boot-overlay" id="bootOverlay" role="dialog" aria-modal="true" aria-label="ポートフォリオ起動画面">
+    <div class="boot-window">
+      <div class="boot-title"><span>TACTICAL PORTFOLIO // BOOT SEQUENCE</span><span>SW-OS / v2.1</span></div>
+      <div class="boot-headline">SYSTEM <span>INITIALIZING</span></div>
+      <p class="boot-sub">ポートフォリオをゲームUI寄りに強化した experimental 版です。<br>HUD、ターゲットUI、ログ表示、起動演出を追加しつつ、営業用にも読みやすいバランスに寄せています。</p>
+      <div class="boot-tipline"><b>SKIP:</b> 画面をタップ / マウスクリック / キーボード入力 / マウスを大きく動かす / SKIPボタン<br>スキップ時も最後に「通信が切れる」ようなテレビ電源OFF風の演出を挟んでTOP表示へ遷移します。</div>
+      <div class="boot-bar"><span id="bootBar"></span></div>
+      <div class="boot-log" id="bootSequenceLog">
+        <div data-boot-step="0"><b>[STEP 01]</b> interface kernel を読み込んでいます...</div>
+        <div data-boot-step="1"><b>[STEP 02]</b> mission records と公開デモへ接続しています...</div>
+        <div data-boot-step="2"><b>[STEP 03]</b> tactical HUD と scan system を同期しています...</div>
+        <div data-boot-step="3"><b>[STEP 04]</b> operator control を開放する準備をしています...</div>
+      </div>
+      <div class="boot-actions"><div class="boot-tip">WAIT FOR FULL BOOT / OR SKIP TO MAIN INTERFACE</div><button type="button" class="boot-skip" id="bootSkip">SKIP INTRO</button></div>
+    </div>
+  </div>
+
+  <header class="site-header" id="top">
+    <div class="header-inner container">
+      <a class="wordmark top-jump" href="#top" aria-label="SATO Works トップに戻る"><span class="wm-icon" aria-hidden="true"></span><span>SATO <em>/</em> WORKS</span></a>
+      <nav class="desktop-nav" aria-label="メインナビゲーション">
+        <a href="#work" data-nav="work">MISSION <small>01</small></a>
+        <a href="#expertise" data-nav="expertise">SYSTEM <small>02</small></a>
+        <a href="#about" data-nav="about">PROFILE <small>03</small></a>
+        <a href="#contact" data-nav="contact">COMMS <small>04</small></a>
+      </nav>
+      <div class="header-actions">
+        <a class="action-link" href="#contact">OPEN CHANNEL ↗</a>
+        <button class="icon-button mobile-menu-button" type="button" id="menuToggle" aria-expanded="false" aria-controls="mobileNav" aria-label="メニューを開く"><span></span><span></span></button>
+      </div>
+    </div>
+    <nav class="mobile-nav" id="mobileNav" aria-label="モバイルナビゲーション" hidden>
+      <a href="#work">01 / MISSION</a>
+      <a href="#expertise">02 / SYSTEM</a>
+      <a href="#about">03 / PROFILE</a>
+      <a href="#contact">04 / COMMS</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero container" aria-labelledby="heroTitle">
+      <div class="hero-left reveal">
+        <div class="section-kicker"><span class="status-led"></span> PORTFOLIO INTERFACE / TACTICAL MODE</div>
+        <h1 id="heroTitle">業務改善を、<br><span class="stroke">HUDの熱量で。</span><br><span class="accent">ゲーム画面みたいに見せる。</span></h1>
+        <p class="hero-lede">業務アプリ、AI導入、業務自動化。<br>実際に動くものを作るエンジニアとしての実績を、ゲームUIらしい演出で再構成したバージョンです。</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#work">ミッション一覧を見る ↗</a>
+          <a class="button secondary" href="#about">オペレータ情報を見る →</a>
+        </div>
+        <div class="hero-tags"><span>WEB APP</span><span>AI WORKFLOW</span><span>AUTOMATION</span><span>GAME-LIKE UI</span></div>
+        <div class="hero-telemetry">
+          <div class="telemetry"><span><i>LIVE DEMOS</i><i>01</i></span><b class="count" data-value="2">2</b><small>公開中の動作デモ</small></div>
+          <div class="telemetry"><span><i>PROJECTS</i><i>02</i></span><b class="count" data-value="4">4</b><small>掲載中の代表プロジェクト</small></div>
+          <div class="telemetry"><span><i>STATUS</i><i>03</i></span><b>READY</b><small>構想から実装まで対応</small></div>
+        </div>
+      </div>
+
+      <div class="hero-right reveal" id="heroRight">
+        <div class="right-head"><span>TACTICAL OVERVIEW</span><span>HUD / ONLINE</span></div>
+        <div class="tactical-frame">
+          <div class="tactical-grid"></div>
+          <div class="orbit-ring r1"></div><div class="orbit-ring r2"></div><div class="orbit-ring r3"></div>
+          <div class="mini-data a"><span>FOCUS</span><b>OPS</b><small>BUSINESS APPS</small></div>
+          <div class="mini-data b"><span>SYNC</span><b>AI</b><small>WORKFLOW LINK</small></div>
+          <div class="mini-data c"><span>STACK</span><b>CF</b><small>WORKERS / D1</small></div>
+          <div class="mini-data d"><span>MODE</span><b>GO</b><small>SHIP / IMPROVE</small></div>
+          <div class="target-core">
+            <div class="corner"></div>
+            <div class="lock-lines"><i></i><i></i><i></i><i></i></div>
+            <div class="core-head"><span>PRIMARY TARGET / BUILD LOOP</span><span>SW-01</span></div>
+            <div class="core-body">
+              <div class="over">CURRENT OBJECTIVE</div>
+              <h2>DESIGN<br><span>BUILD</span><br>SHIP</h2>
+              <div class="progress-stack"><i style="--w:90%"></i><i style="--w:78%"></i><i style="--w:86%"></i></div>
+            </div>
+            <div class="core-footer"><span>PRODUCT × ENGINEERING</span><span>LOCKED</span></div>
+          </div>
+        </div>
+        <div class="terminal-box">
+          <h3>TERMINAL LOG</h3>
+          <div class="terminal-log" id="terminalLog">
+            <div><b>[BOOT]</b> operator session started</div>
+            <div><em>[SCAN]</em> selected works loaded</div>
+            <div><b>[LINK]</b> live demos connected</div>
+            <div><em>[READY]</em> interface awaiting input</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container dual-data reveal" aria-label="概要情報">
+      <article class="data-panel">
+        <h3>MISSION BOARD</h3>
+        <div class="list-board">
+          <div class="board-item"><div class="num">01</div><div><b>業務に効くWebアプリを作る</b><p>勤怠、見積、受付、予約など、現場で毎日使う仕組みを扱いやすい画面として実装します。</p></div><small>WEB APP</small></div>
+          <div class="board-item"><div class="num">02</div><div><b>AIを実運用へつなぐ</b><p>AIワークフローや自動化を、運用・安全性も含めて現場へ導入しやすい形に整えます。</p></div><small>AI / AUTOMATION</small></div>
+          <div class="board-item"><div class="num">03</div><div><b>UIに楽しさを足す</b><p>ゲームUIの気持ちよさを参考に、見やすく、触りたくなる体験を業務ツールにも取り入れます。</p></div><small>UI / MOTION</small></div>
+        </div>
+      </article>
+      <article class="data-panel">
+        <h3>SYSTEM STATUS</h3>
+        <div class="stat-grid">
+          <div class="stat-cell"><span>WORK STYLE</span><b>REMOTE</b><small>フルリモート中心</small></div>
+          <div class="stat-cell"><span>PRIMARY ROLE</span><b>FDE</b><small>業務改善・AI導入</small></div>
+          <div class="stat-cell"><span>DELIVERY</span><b>FAST</b><small>小さく作って改善</small></div>
+          <div class="stat-cell"><span>VISUAL MODE</span><b>HUD</b><small>ゲームUI強化版</small></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="section container" id="work" aria-labelledby="workTitle">
+      <div class="section-head reveal">
+        <div><div class="section-index">01 / MISSION RECORDS</div><h2 id="workTitle">実績データベース</h2></div>
+        <div><p>公開デモと進行中のプロジェクトを、<br>ターゲットUI風カードで見せつつ、クリックで詳細展開できる構成にしています。</p><div class="filters" role="group" aria-label="制作実績フィルター"><button type="button" class="filter active" data-filter="all" aria-pressed="true">ALL</button><button type="button" class="filter" data-filter="live" aria-pressed="false">LIVE</button><button type="button" class="filter" data-filter="build" aria-pressed="false">IN PROGRESS</button></div></div>
+      </div>
+
+      <div class="project-grid">
+        <article class="card large reveal expandable-card" data-category="live">
+          <div class="card-top"><span class="card-id">/ 01</span><span class="card-status"><i class="status-dot live"></i> LIVE TARGET</span></div>
+          <div class="card-preview targeted">
+            <div class="att-ui"><div class="att-rail"><b>◈</b><i class="active"></i><i></i><i></i><i></i></div><div class="att-main"><div class="att-top"><span>Overview / Attendance</span><span class="avatar">SW</span></div><h4>Good morning<span style="color:var(--lime)">.</span></h4><div class="att-boxes"><div class="att-box"><span>TODAY'S ATTENDANCE</span><b>08</b></div><div class="att-box"><span>ACTIVE LOCATIONS</span><b>05</b></div></div><div class="att-chart"><i style="--h:42%"></i><i style="--h:66%"></i><i style="--h:55%"></i><i style="--h:88%"></i><i style="--h:76%"></i><i style="--h:64%"></i><i style="--h:48%"></i></div></div></div>
+          </div>
+          <div class="card-body"><div class="card-copy"><p class="card-type">WEB APP / BUSINESS OPERATIONS</p><h3>GPS対応 勤怠管理システム</h3><p>位置情報を使った打刻、シフト・スタッフ管理、管理画面まで。現場運用を意識した勤怠アプリ。</p><div class="tags"><span>Cloudflare Workers</span><span>D1</span><span>PWA</span><span>GPS</span></div></div><div class="card-actions"><button type="button" class="detail-toggle" aria-expanded="false"><span class="toggle-open">DETAIL</span><span class="toggle-close">CLOSE</span></button><a class="open-link" href="https://kintai.demo-b39.workers.dev/" target="_blank" rel="noopener noreferrer" aria-label="GPS勤怠管理システムのデモを見る">↗</a></div></div>
+          <div class="card-detail"><div class="detail-grid"><div class="detail-block"><span>WHAT IT SOLVES</span><b>直行直帰や複数現場の勤怠を、GPS前提で一元管理しやすくする用途を想定。</b></div><div class="detail-block"><span>NOTES</span><b>Cloudflare Workers + D1 ベース。小規模事業者でも扱いやすい運用を意識しています。</b></div></div><p class="detail-note">デモとして打刻・シフト・スタッフ管理まで一通り見せられる構成です。公開実績としての強さがあるので、ポートフォリオ上でも主力に置いています。</p></div>
+        </article>
+
+        <article class="card large reveal expandable-card" data-category="live">
+          <div class="card-top"><span class="card-id">/ 02</span><span class="card-status"><i class="status-dot live"></i> LIVE TARGET</span></div>
+          <div class="card-preview targeted"><div class="invoice-ui"><div class="invoice-sheet"><div class="head"><b>INVOICE</b><span>SW / 002</span></div><div class="meta"><div>ISSUED TO / Your Company</div><div>DATE / 2026-11-11</div></div><div class="invoice-table"><div class="invoice-row"><span>DESCRIPTION</span><span>AMOUNT</span></div><div class="invoice-row"><span>Web application</span><strong>¥180,000</strong></div><div class="invoice-row"><span>System setup</span><strong>¥30,000</strong></div><div class="invoice-row"><span>Support</span><strong>¥10,000</strong></div></div><div class="invoice-total"><span>TOTAL</span><b>¥220,000</b></div><div class="invoice-stamp">PDF READY</div></div></div></div>
+          <div class="card-body"><div class="card-copy"><p class="card-type">WEB APP / DOCUMENT WORKFLOW</p><h3>見積・請求書発行システム</h3><p>取引先管理から帳票作成、PDF発行、履歴管理まで。日々の事務作業を整理するツール。</p><div class="tags"><span>React</span><span>Workers</span><span>D1</span><span>PDF</span></div></div><div class="card-actions"><button type="button" class="detail-toggle" aria-expanded="false"><span class="toggle-open">DETAIL</span><span class="toggle-close">CLOSE</span></button><a class="open-link" href="https://hakkou.demo-b39.workers.dev/" target="_blank" rel="noopener noreferrer" aria-label="見積・請求書発行システムのデモを見る">↗</a></div></div>
+          <div class="card-detail"><div class="detail-grid"><div class="detail-block"><span>WHAT IT SOLVES</span><b>見積・請求作成、履歴管理、PDF出力をまとめ、事務作業の手間を減らします。</b></div><div class="detail-block"><span>NOTES</span><b>帳票業務をシンプルに見せやすいので、受託やプロダクトの入口としても説明しやすい実績です。</b></div></div><p class="detail-note">デザイン面では、業務画面でも整理された見た目にしやすい題材です。営業相手にも価値が伝わりやすいカードとして掲載しています。</p></div>
+        </article>
+
+        <article class="card small reveal expandable-card" data-category="build">
+          <div class="card-top"><span class="card-id">/ 03</span><span class="card-status"><i class="status-dot build"></i> BUILDING</span></div>
+          <div class="card-preview"><div class="andw-ui"><div class="andw-side"><b>ANDW<span>.</span></b><small>WORKSPACE</small><i></i><i></i><i></i></div><div class="andw-main"><div class="andw-top"><span>PROJECT / SPEC</span><span>● ● ●</span></div><h4>Beautiful docs,<br>clear thinking.</h4><div class="line"></div><div class="line short"></div><div class="block"></div></div></div></div>
+          <div class="card-body"><div class="card-copy"><p class="card-type">DESKTOP / DOCUMENT EXPERIENCE</p><h3>ANDW</h3><p>Markdownドキュメントを美しく表示し、読む・整理する体験を磨くドキュメント特化ビューア。</p><div class="tags"><span>Electron</span><span>TypeScript</span><span>Markdown</span></div></div><div class="card-actions"><button type="button" class="detail-toggle" aria-expanded="false"><span class="toggle-open">DETAIL</span><span class="toggle-close">CLOSE</span></button></div></div>
+          <div class="card-detail"><div class="detail-grid"><div class="detail-block"><span>WHAT IT AIMS</span><b>AI生成の仕様書・要件書を、アプリのように美しく読める体験へ寄せる構想です。</b></div><div class="detail-block"><span>NOTES</span><b>見た目重視・PDF出力・テーマ切り替えなど、ドキュメント体験を強化する方向性です。</b></div></div><p class="detail-note">ゲームUIから得た「情報の見せ方」は、ANDWのようなドキュメント系プロダクトとも相性が良いと考えています。</p></div>
+        </article>
+
+        <article class="card small reveal expandable-card" data-category="build">
+          <div class="card-top"><span class="card-id">/ 04</span><span class="card-status"><i class="status-dot build"></i> BUILDING</span></div>
+          <div class="card-preview"><div class="pab-ui"><div class="flow"><div class="node">YOU<span>INPUT</span></div><div class="connector"></div><div class="node">AI<span>REVIEW</span></div><div class="connector"></div><div class="node">CODE<span>BUILD</span></div></div><div class="pab-foot"><span>AUTOMATION WITH CONTROL</span><span>◎ SAFE LOOP</span></div></div></div>
+          <div class="card-body"><div class="card-copy"><p class="card-type">LOCAL TOOL / AI AUTOMATION</p><h3>Personal AI Bridge</h3><p>AIエージェントとローカル環境の安全な連携を目指す、自動化のための橋渡しプロジェクト。</p><div class="tags"><span>Electron</span><span>AI Workflow</span><span>Security</span></div></div><div class="card-actions"><button type="button" class="detail-toggle" aria-expanded="false"><span class="toggle-open">DETAIL</span><span class="toggle-close">CLOSE</span></button></div></div>
+          <div class="card-detail"><div class="detail-grid"><div class="detail-block"><span>WHAT IT AIMS</span><b>AIにローカル操作やファイル操作を安全に橋渡しし、開発フローの自動化を支える構想です。</b></div><div class="detail-block"><span>NOTES</span><b>安全ゲート・権限制御・レビューを意識した、現実的なAI支援ワークフローを目指しています。</b></div></div><p class="detail-note">実現すれば、自分自身の制作効率だけでなく、AI導入支援の実績としても強い見せ方ができます。</p></div>
+        </article>
+      </div>
+      <p class="work-note reveal">※ ビジュアルは説明用モックアップです。ゲームUIらしい見せ方を強化しつつ、詳細が読めるようカード展開も追加しています。</p>
+    </section>
+
+    <section class="section container" id="expertise" aria-labelledby="expertiseTitle">
+      <div class="section-head reveal"><div><div class="section-index">02 / SYSTEM CAPABILITIES</div><h2 id="expertiseTitle">機能と戦術</h2></div><p>単なるスキル一覧ではなく、<br>どういう強みとして使うかをゲームUI風に整理しています。</p></div>
+      <div class="skill-grid">
+        <article class="card skill-card reveal"><div class="icon">⌘</div><div class="code">01 / WEB APP</div><h3>業務アプリ制作</h3><p>勤怠、見積、予約、受付など、日常業務の流れに沿うWebアプリを設計・実装します。</p><div class="meta">REACT / TYPESCRIPT / PWA</div></article>
+        <article class="card skill-card reveal"><div class="icon">✦</div><div class="code">02 / AI FLOW</div><h3>AI導入・自動化</h3><p>AIワークフローや定型処理の自動化を、運用・安全性も含めて構築します。</p><div class="meta">AI WORKFLOW / GAS / API</div></article>
+        <article class="card skill-card reveal"><div class="icon">◫</div><div class="code">03 / UI SYSTEM</div><h3>UI演出と体験設計</h3><p>ゲームUIの楽しさを参考に、視認性と操作して気持ちいい体験を両立させます。</p><div class="meta">MOTION / UX / PRODUCT DESIGN</div></article>
+      </div>
+      <div class="lower-grid reveal">
+        <article class="data-panel"><h3>TOOL ARSENAL</h3><div class="tool-cloud"><span>TypeScript</span><span>JavaScript</span><span>React</span><span>Cloudflare Workers</span><span>Hono</span><span>D1</span><span>Electron</span><span>Tailwind CSS</span><span>GitHub</span><span>AI-assisted Dev</span></div></article>
+        <article class="data-panel radar-panel"><h3>SCAN RADAR</h3><div class="radar-wrap"><div class="radar" aria-hidden="true"><div class="radar-frame"></div><div class="radar-core"></div><div class="radar-axis-x"></div><div class="radar-axis-y"></div><div class="radar-sector"></div><div class="radar-dot one"></div><div class="radar-dot two"></div><div class="radar-dot three"></div></div></div></article>
+      </div>
+    </section>
+
+    <section class="section container" id="about" aria-labelledby="aboutTitle">
+      <div class="about-grid">
+        <article class="card about-panel reveal"><div class="badge">OPERATOR PROFILE / SATO WORKS</div><h2 id="aboutTitle">技術も、演出も、<br>使いやすさも。</h2><p>ソフトウェア開発を軸に、業務システムや個人開発プロダクトに取り組んでいます。AIを開発の道具として活用しながら、設計・実装・検証まで手を動かすスタイルです。</p><p>小さく作って改善を重ねる実務性と、見た目や操作体験の楽しさ。その両立を意識してプロダクトを作っています。</p><div class="meta-grid"><div class="meta-cell"><span>BASED IN</span><b>JAPAN</b></div><div class="meta-cell"><span>FOCUS</span><b>PRODUCT × ENGINEERING</b></div><div class="meta-cell"><span>STYLE</span><b>Small start,<br>fast improve</b></div><div class="meta-cell"><span>MEDIA</span><b><a href="https://tera-imakara.com/" target="_blank" rel="noopener noreferrer">SATO LAB ↗</a></b></div></div></article>
+        <article class="card about-panel reveal"><div class="section-index">BUILD LOOP / HOW I WORK</div><div class="timeline"><div class="step"><div class="n">01</div><div><b>課題を整理する</b><p>必要な画面や機能を見極め、情報の優先順位を整理して構成を作ります。</p></div></div><div class="step"><div class="n">02</div><div><b>まず動くものを作る</b><p>素早くデモを用意し、実際の操作感を見ながら方向性を固めます。</p></div></div><div class="step"><div class="n">03</div><div><b>改善を回し続ける</b><p>UI・運用・体験を磨きながら、長く使えるプロダクトへ育てます。</p></div></div></div></article>
+      </div>
+    </section>
+
+    <section class="section container" id="contact" aria-labelledby="contactTitle">
+      <div class="contact-grid">
+        <article class="contact-panel reveal"><div class="section-index">04 / OPEN COMMUNICATION CHANNEL</div><h2 class="contact-title" id="contactTitle">次のアイデアを、<br><em>一緒に出撃させる。</em></h2><p>制作相談、業務アプリのアイデア、AI導入、業務自動化、ポートフォリオ改善など。まずは気軽にご連絡ください。</p><div class="contact-actions"><a class="button primary" href="mailto:contact@tera-imakara.com?subject=SATO%20Works%E3%81%B8%E3%81%AE%E3%81%94%E7%9B%B8%E8%AB%87">メールで相談する ↗</a><a class="button secondary top-jump" href="#top">トップに戻る ↑</a></div></article>
+        <article class="contact-panel contact-side reveal"><h3>CHANNEL DATA</h3><a class="mail-link" href="mailto:contact@tera-imakara.com">contact@tera-imakara.com</a><div class="contact-list"><div><span>WORK STYLE</span><b>フルリモート中心 / 業務改善・AI導入エンジニア</b></div><div><span>SUITABLE MISSIONS</span><b>Webアプリ、業務自動化、AIワークフロー、プロダクト改善</b></div><div><span>VISUAL STYLE</span><b>ゲームUIを活かした、見やすく触って気持ちいいインターフェース</b></div></div></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div><a class="wordmark top-jump" href="#top"><span class="wm-icon" aria-hidden="true"></span><span>SATO <em>/</em> WORKS</span></a><div class="footer-code">TACTICAL PORTFOLIO / GAME UI VERSION</div></div>
+      <div class="footer-right"><a href="https://tera-imakara.com/" target="_blank" rel="noopener noreferrer">SATO LAB ↗</a><a href="#work">MISSION</a><a href="#contact">COMMS</a></div>
+    </div>
+  </footer>
+
+  <script>
+  (() => {
+    'use strict';
+    const body = document.body;
+    const progressBar = document.getElementById('progressBar');
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileNav = document.getElementById('mobileNav');
+    const bootOverlay = document.getElementById('bootOverlay');
+    const bootBar = document.getElementById('bootBar');
+    const bootSkip = document.getElementById('bootSkip');
+    const bootLines = [...document.querySelectorAll('#bootSequenceLog [data-boot-step]')];
+    const heroRight = document.getElementById('heroRight');
+    const navLinks = [...document.querySelectorAll('[data-nav]')];
+    const reveals = [...document.querySelectorAll('.reveal')];
+    const filterButtons = [...document.querySelectorAll('[data-filter]')];
+    const cards = [...document.querySelectorAll('.card[data-category]')];
+    const counts = [...document.querySelectorAll('.count[data-value]')];
+    const expandableCards = [...document.querySelectorAll('.expandable-card')];
+    const topJumps = [...document.querySelectorAll('.top-jump')];
+    const radars = [...document.querySelectorAll('.radar')];
+    const terminalLines = [
+      '[SYNC] operator session confirmed',
+      '[SCAN] live demo routes checked',
+      '[LOCK] target cards primed',
+      '[READY] command interface stable',
+      '[PING] andw build beacon detected',
+      '[AI] bridge telemetry nominal'
+    ];
+
+    let bootClosed = false;
+    let bootAnimating = false;
+    let bootMouseStart = null;
+
+    const closeMenu = () => {
+      menuToggle?.setAttribute('aria-expanded', 'false');
+      menuToggle?.setAttribute('aria-label', 'メニューを開く');
+      if (mobileNav) mobileNav.hidden = true;
+    };
+    menuToggle?.addEventListener('click', () => {
+      const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+      menuToggle.setAttribute('aria-expanded', String(!expanded));
+      menuToggle.setAttribute('aria-label', expanded ? 'メニューを開く' : 'メニューを閉じる');
+      if (mobileNav) mobileNav.hidden = expanded;
+    });
+    mobileNav?.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+    window.addEventListener('resize', () => { if (window.innerWidth > 840) closeMenu(); });
+
+    topJumps.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'auto' });
+        if (mobileNav && !mobileNav.hidden) closeMenu();
+        history.replaceState?.(null, '', '#top');
+      });
+    });
+
+    let scrolling = false;
+    const updateProgress = () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      const value = total > 0 ? Math.min(100, Math.max(0, (window.scrollY / total) * 100)) : 0;
+      progressBar.style.width = value + '%';
+      scrolling = false;
+    };
+    window.addEventListener('scroll', () => {
+      if (!scrolling) {
+        requestAnimationFrame(updateProgress);
+        scrolling = true;
+      }
+    }, { passive:true });
+    updateProgress();
+
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      window.addEventListener('pointermove', (e) => {
+        body.style.setProperty('--pointer-x', e.clientX + 'px');
+        body.style.setProperty('--pointer-y', e.clientY + 'px');
+      }, { passive:true });
+      heroRight?.addEventListener('pointermove', (e) => {
+        const rect = heroRight.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width - .5) * 18;
+        const y = ((e.clientY - rect.top) / rect.height - .5) * 18;
+        body.style.setProperty('--hero-x', x.toFixed(2) + 'px');
+        body.style.setProperty('--hero-y', y.toFixed(2) + 'px');
+      });
+      heroRight?.addEventListener('pointerleave', () => {
+        body.style.setProperty('--hero-x', '0px');
+        body.style.setProperty('--hero-y', '0px');
+      });
+    }
+
+    const secObs = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(link => link.classList.toggle('active', link.dataset.nav === entry.target.id));
+        }
+      });
+    }, { threshold:.4 }) : null;
+    ['work','expertise','about','contact'].forEach(id => { const el = document.getElementById(id); if (el && secObs) secObs.observe(el); });
+
+    const revealObs = ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches)
+      ? new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              revealObs.unobserve(entry.target);
+            }
+          });
+        }, { threshold:.14, rootMargin:'0px 0px -36px 0px' }) : null;
+    reveals.forEach(el => revealObs ? revealObs.observe(el) : el.classList.add('is-visible'));
+
+    const animateCount = (el) => {
+      const target = Number(el.dataset.value || 0);
+      const start = performance.now();
+      const duration = 900;
+      const step = (now) => {
+        const p = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = String(Math.round(target * eased));
+        if (p < 1) requestAnimationFrame(step);
+      };
+      el.classList.add('is-ready');
+      requestAnimationFrame(step);
+    };
+    const countObs = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateCount(entry.target);
+          countObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold:.6 }) : null;
+    counts.forEach(el => countObs ? countObs.observe(el) : el.classList.add('is-ready'));
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const filter = button.dataset.filter;
+        filterButtons.forEach(other => {
+          const active = other === button;
+          other.classList.toggle('active', active);
+          other.setAttribute('aria-pressed', String(active));
+        });
+        cards.forEach(card => { card.hidden = !(filter === 'all' || card.dataset.category === filter); });
+      });
+    });
+
+    const closeOtherCards = (current) => {
+      expandableCards.forEach(card => {
+        if (card !== current) {
+          card.classList.remove('is-open');
+          card.querySelector('.detail-toggle')?.setAttribute('aria-expanded', 'false');
+        }
+      });
+    };
+    const toggleCard = (card, forceOpen = null) => {
+      const willOpen = forceOpen !== null ? forceOpen : !card.classList.contains('is-open');
+      closeOtherCards(card);
+      card.classList.toggle('is-open', willOpen);
+      card.querySelector('.detail-toggle')?.setAttribute('aria-expanded', String(willOpen));
+    };
+    expandableCards.forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('a') || e.target.closest('button')) return;
+        toggleCard(card);
+      });
+      card.querySelector('.detail-toggle')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleCard(card);
+      });
+    });
+
+    const terminal = document.getElementById('terminalLog');
+    let lineIndex = 0;
+    const pushTerminal = () => {
+      if (!terminal) return;
+      const line = document.createElement('div');
+      const raw = terminalLines[lineIndex % terminalLines.length];
+      line.innerHTML = raw.startsWith('[SYNC]') || raw.startsWith('[LOCK]') || raw.startsWith('[READY]')
+        ? `<b>${raw.slice(0, raw.indexOf(']') + 1)}</b>${raw.slice(raw.indexOf(']') + 1)}`
+        : `<em>${raw.slice(0, raw.indexOf(']') + 1)}</em>${raw.slice(raw.indexOf(']') + 1)}`;
+      terminal.appendChild(line);
+      while (terminal.children.length > 6) terminal.removeChild(terminal.firstElementChild);
+      lineIndex += 1;
+    };
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(pushTerminal, 2200);
+
+    const finalizeBoot = () => {
+      if (!bootOverlay) return;
+      bootClosed = true;
+      bootOverlay.classList.add('hidden');
+      setTimeout(() => bootOverlay.remove(), 340);
+      document.removeEventListener('keydown', onBootKey);
+      bootOverlay.removeEventListener('pointerdown', onBootPointerDown);
+      bootOverlay.removeEventListener('touchstart', onBootTouchStart);
+      bootOverlay.removeEventListener('click', onBootClick);
+      bootOverlay.removeEventListener('pointermove', onBootPointerMove);
+      bootSkip?.removeEventListener('click', requestBootClose);
+    };
+    const requestBootClose = () => {
+      if (bootClosed || bootAnimating || !bootOverlay) return;
+      bootAnimating = true;
+      bootOverlay.setAttribute('aria-hidden', 'true');
+      bootOverlay.classList.add('closing');
+      setTimeout(finalizeBoot, 280);
+    };
+    const onBootKey = () => requestBootClose();
+    // A tap anywhere, including the SKIP button, closes the boot screen.
+    // touchstart covers mobile browsers / embedded HTML viewers that do not emit pointerdown.
+    const onBootPointerDown = () => requestBootClose();
+    const onBootTouchStart = () => requestBootClose();
+    const onBootClick = () => requestBootClose();
+    const onBootPointerMove = (e) => {
+      if (bootClosed || bootAnimating) return;
+      if (!bootMouseStart) {
+        bootMouseStart = { x: e.clientX, y: e.clientY };
+        return;
+      }
+      const dx = e.clientX - bootMouseStart.x;
+      const dy = e.clientY - bootMouseStart.y;
+      if (Math.hypot(dx, dy) > 140) requestBootClose();
+    };
+
+
+    const animateRadar = () => {
+      if (!radars.length || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const sweepPeriod = 5000;
+      const sectorCenterOffset = 96;
+      const sectorThreshold = 11;
+      const start = performance.now();
+      const tick = (now) => {
+        const elapsed = now - start;
+        const angle = ((elapsed % sweepPeriod) / sweepPeriod) * 360;
+        radars.forEach(radar => {
+          radar.style.setProperty('--radar-angle', angle.toFixed(2) + 'deg');
+          const rect = radar.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          radar.querySelectorAll('.radar-dot').forEach(dot => {
+            const dotRect = dot.getBoundingClientRect();
+            const dx = (dotRect.left + dotRect.width / 2) - cx;
+            const dy = (dotRect.top + dotRect.height / 2) - cy;
+            const dotAngle = (Math.atan2(dy, dx) * 180 / Math.PI + 90 + 360) % 360;
+            const sweepAngle = (angle + sectorCenterOffset) % 360;
+            const delta = Math.abs((((dotAngle - sweepAngle) + 540) % 360) - 180);
+            if (delta < sectorThreshold) {
+              if (!dot.dataset.pingLock) {
+                dot.dataset.pingLock = '1';
+                dot.classList.remove('is-ping');
+                void dot.offsetWidth;
+                dot.classList.add('is-ping');
+              }
+            } else if (delta > sectorThreshold + 8) {
+              dot.dataset.pingLock = '';
+            }
+          });
+        });
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+    animateRadar();
+
+    if (bootOverlay) {
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const duration = reduced ? 10 : 5200;
+      const steps = bootLines.length;
+      let currentStep = -1;
+      const start = performance.now();
+      const animateBoot = (now) => {
+        if (bootClosed || bootAnimating) return;
+        const p = Math.min(1, (now - start) / duration);
+        bootBar.style.width = (p * 100).toFixed(1) + '%';
+        const nextStep = Math.min(steps - 1, Math.floor(p * steps));
+        if (nextStep !== currentStep) {
+          currentStep = nextStep;
+          bootLines.forEach((line, idx) => line.classList.toggle('active', idx <= currentStep));
+        }
+        if (p < 1) {
+          requestAnimationFrame(animateBoot);
+        } else {
+          setTimeout(requestBootClose, reduced ? 0 : 120);
+        }
+      };
+      requestAnimationFrame(animateBoot);
+      document.addEventListener('keydown', onBootKey);
+      bootOverlay.addEventListener('pointerdown', onBootPointerDown);
+      bootOverlay.addEventListener('touchstart', onBootTouchStart, { passive: true });
+      bootOverlay.addEventListener('click', onBootClick);
+      bootOverlay.addEventListener('pointermove', onBootPointerMove);
+      bootSkip?.addEventListener('click', requestBootClose);
+      // Always terminate even if animation frames are throttled by a mobile browser.
+      setTimeout(requestBootClose, duration + 850);
+    }
+  })();
+  </script>
+</body>
+</html>
