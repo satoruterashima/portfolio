@@ -1,43 +1,61 @@
-# SATO Works — Game UI Portfolio (v2.5)
+# SATO Works — Portfolio / Game UI (v3.0)
 
-SATO Works のゲームUI強化版ポートフォリオです。既存の `portfolio/index.html`（GitHub Pages用）を変更せず、`game-ui/index.html` に配置しています。
+業務改善Webアプリ、AI・開発支援、Chrome拡張、個人プロダクトの制作実績を紹介する静的ポートフォリオです。ゲーム風のHUD、レーダー、起動画面の演出を維持しながら、**作品の目的・実装状況・公開先**が伝わる文言へ更新しています。
 
-## Cloudflare Pages で公開する
+既存のリポジトリ直下 `index.html` は変更せず、このフォルダ内 `game-ui/index.html` を公開する想定です。
 
-Cloudflare Dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git** から次の設定で公開できます。
+## プロジェクト（全9件）
+
+| カテゴリ | 作品 | 状況 |
+|---|---|---|
+| 業務システム | GPS勤怠管理システム | 公開中（デモ） |
+| 業務システム | 見積・請求書発行システム | 公開中（デモ） |
+| Chrome拡張 | Video Time Notes | 公開中（Chromeウェブストア） |
+| Chrome拡張 | Auto Manual Spec | 実機検証中 |
+| Chrome拡張 | Real-time Audio Translator | 実機検証中 |
+| AI・開発支援 | Personal AI Bridge | 開発中 |
+| AI・開発支援 | Universal AI Monitor | 開発中 |
+| 個人プロダクト | ANDW | 開発中 |
+| 個人プロダクト | I'm done! | 仕様策定中 |
+
+カテゴリと開発状況は**独立したフィルター**です。「開発・検証中」は開発中と実機検証中の両方を表示します。各カードの `DETAIL` で、解決する課題と現在の進捗を確認できます。
+
+公開前の作品について、完成済み・本番運用中と誤認させないようにしています。
+
+## Cloudflare Pages でGitHub連携
+
+Cloudflare Dashboard → Workers & Pages → 新規作成 → Pages → GitHub接続から設定します。
 
 | 設定 | 値 |
 |---|---|
 | GitHub repository | `satoruterashima/portfolio` |
 | Production branch | `main` |
 | Framework preset | `None` |
-| Root directory | リポジトリのルート（変更しない） |
-| Build command | **空欄** |
+| Root directory | リポジトリのルート |
+| Build command | 空欄 |
 | Build output directory | `game-ui` |
 
-このフォルダの `index.html` が新しい Cloudflare Pages サイトのトップページになります。
+静的な `index.html` だけで表示できます。Node.js・ビルドコマンドは不要です。すでにこの設定で連携済みなら、`main` 更新によって自動デプロイされます（Cloudflare側の連携設定によります）。
 
-> 重要：出力先を `/（root）` や `public` にすると、既存の別サイトが公開対象になる可能性があります。**`game-ui`** を選んでください。
-
-## 内容
-
-- タクティカルHUD風のヒーロー
-- ローディング／テレビ電源OFF風の終了演出（スマホは画面タップでスキップ可能）
-- SCAN RADAR／スイープ通過時の4回点滅
-- 実績カードの DETAIL 展開とフィルタ
-- 公開済みデモへのリンク
-- スマートフォン対応
-
-## ローカル確認
+## ローカルプレビュー
 
 ```bash
 python -m http.server 8000
 ```
 
-リポジトリのルートで起動し、`http://localhost:8000/game-ui/` を開いてください。
+リポジトリのルートで実行し、`http://localhost:8000/game-ui/` を開きます。
+
+## 演出
+
+- HUD風のトップ画面、SCAN RADAR、ポイント通過時の点滅
+- テレビ電源OFF風のローディング終了演出
+- マウス・キーボード・タップによるローディングスキップ
+- 実績カード展開、カテゴリ・開発状況の絞り込み
+- スマートフォン表示・低モーション設定への配慮
 
 ## 注意
 
-- サイト内の実績プレビュー画像・数値は、説明用のモックアップです。
-- 外部デモの公開状態や問い合わせ先は、公開前に確認してください。
-- このフォルダ単体で完結する静的HTMLのため、Node.jsやビルド処理は不要です。
+- カード内のプレビューは説明用モックアップです。実際の製品画面ではありません。
+- 公開前に、問い合わせメールアドレスの受信可否と外部リンクを確認してください。
+- Real-time Audio Translatorの音声認識→翻訳字幕の一連の動作、Auto Manual Specの実機撮影などは検証継続中です。
+- 本番へのデプロイはCloudflareのGitHub連携設定に依存します。
