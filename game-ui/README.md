@@ -1,4 +1,4 @@
-# SATO Works — Portfolio / Game UI (v3.1)
+# SATO Works — Portfolio / Game UI (v3.2)
 
 業務改善Webアプリ、AI・開発支援、Chrome拡張、個人プロダクトの制作実績を紹介する静的ポートフォリオです。ゲーム風のHUD、レーダー、起動画面の演出を維持しながら、**作品の目的・実装状況・公開先**が伝わる文言へ更新しています。
 
@@ -77,3 +77,10 @@ python -m http.server 8000
 - Universal AI Monitor・ANDW・SATO Dev Hub のスクリーンショット4枚を追加
 - SATO Dev Hubの新規カードを作成し、掲載作品数を10に変更
 - デモ画像には合成データ使用の注記を併記
+
+## v3.2：Video Time Notes画像・デスクトップとスマホの版ずれ対策
+
+- 正式なサイトソースはこのリポジトリの `game-ui/index.html` です。過去に配布されたローカル `sato-portfolio-game-preview.html` は古い6作品版で、GitHub上の公開用10作品版とは内容が異なります。
+- GitHub Pages／Cloudflare Pages連携時には `game-ui/` を公開フォルダに指定してください。PCでもスマホでも同じ公開URLを開くと同じHTMLを参照できます。
+- Video Time Notesの表示画像は相対パス `assets/projects/vtn-actual-ui-20261118.webp` で読み込み、クリックすると元画像 `assets/projects/vtn-actual-full-20261118.webp` を表示します。
+- 画像が更新前のままの場合は、GitHubの最新コミットがCloudflareにデプロイ済みかを確認し、キャッシュの再読み込みを実施してください。

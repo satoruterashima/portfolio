@@ -182,6 +182,14 @@
 .andw-shot .screenshot-shot img,.uam-shot .screenshot-shot img{object-fit:contain;object-position:center;background:#07101b}
 @media(max-width:600px){.andw-shot{grid-template-columns:1fr;grid-template-rows:repeat(2,minmax(0,1fr));gap:8px}.card-preview:has(.andw-shot){height:380px}.screenshot-caption{font-size:11px}}
 
+
+/* Video Time Notes — real screenshot, cropped for portfolio preview */
+.vtn-preview{padding:10px;background:#101725;overflow:hidden}
+.vtn-preview .screenshot-single{grid-template-columns:minmax(0,1fr);width:100%;min-width:0}
+.vtn-preview .screenshot-shot{display:block;width:100%;min-width:0;max-width:100%;height:100%;background:#f4f6fa}
+.vtn-preview .screenshot-shot img{width:100%;height:100%;display:block;object-fit:contain;object-position:center;background:#f4f6fa}
+@media(max-width:600px){.vtn-preview{padding:8px}.vtn-preview .screenshot-shot{border-radius:7px}.vtn-preview .screenshot-caption{font-size:12px}}
+
 </style>
 </head>
 <body>
@@ -332,7 +340,14 @@
         </article>
         <article class="card project-card medium reveal expandable-card" data-category="extension" data-status="live" data-project="03">
           <div class="card-top"><span class="card-id">/ 03 · Chrome拡張</span><span class="card-status"><i class="status-dot live"></i>公開中</span></div>
-          <div class="card-preview screenshot-pending" aria-label="Video Time Notesのスクリーンショットは準備中"><div class="pending-shell"><div class="pending-mark" aria-hidden="true">◇</div><div class="pending-title">Video Time Notes</div><div class="pending-message">実際のスクリーンショットを準備中です</div><div class="pending-code">SCREENSHOT PENDING</div></div></div>
+          <div class="card-preview targeted screenshot-preview vtn-preview" aria-label="Video Time Notesの実スクリーンショット">
+ <div class="screenshot-pair screenshot-single vtn-shot">
+ <a class="screenshot-shot" href="assets/projects/vtn-actual-full-20261118.webp" target="_blank" rel="noopener noreferrer" aria-label="Video Time Notesの元のスクリーンショット全体を開く">
+ <img src="assets/projects/vtn-actual-ui-20261118.webp" alt="Video Time Notesの実画面。YouTube動画の時刻付きメモ、保存済みメモ、場面を開く・編集・削除・Markdown出力の操作が表示されている" loading="lazy" decoding="async" width="535" height="488">
+ <span class="screenshot-index">ACTUAL SCREEN</span><span class="screenshot-caption">YouTubeの場面メモ <span aria-hidden="true">↗</span></span>
+ </a>
+ </div>
+ </div>
           <div class="card-body"><div class="card-copy"><p class="card-type">CHROME EXTENSION / VIDEO NOTES</p><h3>Video Time Notes</h3><p class="project-lead">動画の「ここが大事」を、時間と一緒に残す。</p><p>YouTubeの好きな場面へすぐ戻れる、時刻付きメモ拡張機能。メモの検索やJSON・Markdownへの書き出しにも対応しています。</p><div class="tags"><span>Chrome Extension</span><span>TypeScript</span><span>IndexedDB</span><span>8言語</span></div></div><div class="card-actions"><button type="button" class="detail-toggle" aria-expanded="false" aria-controls="detail-03"><span class="toggle-open">DETAIL</span><span class="toggle-close">CLOSE</span></button><a class="open-link" href="https://chromewebstore.google.com/detail/video-time-notes/dphocbneblgncflajhdiemmebpalkkef" target="_blank" rel="noopener noreferrer" aria-label="Video Time Notes：Chromeウェブストア">↗</a></div></div>
           <div class="card-detail" id="detail-03"><div class="detail-grid"><div class="detail-block"><span>GOAL / 解決したい課題</span><b>学習動画・技術解説を見返すときに、重要な場面を探す手間を減らす。</b></div><div class="detail-block"><span>CURRENT STAGE / 現在の状況</span><b>Chromeウェブストアで公開済み。動画時刻リンク、検索、エクスポートを利用できます。</b></div></div><div class="detail-note"><a class="project-live-link" href="https://chromewebstore.google.com/detail/video-time-notes/dphocbneblgncflajhdiemmebpalkkef" target="_blank" rel="noopener noreferrer">Chromeウェブストア ↗</a></div></div>
         </article>
@@ -380,7 +395,7 @@
         </article>
       </div>
       <p class="project-empty" id="projectEmpty" hidden>この条件に一致するプロジェクトはありません。カテゴリか開発状況を変更してください。</p>
-      <p class="work-note reveal">※ 勤怠管理・見積請求・ANDW・SATO Dev Hub・Universal AI Monitorは実画面を掲載しています。画像を押すと拡大できます。UAMは合成データによるローカルデモ画面です。その他の作品は実画面受領後に順次追加します。</p>
+      <p class="work-note reveal">※ 勤怠管理・見積請求・Video Time Notes・ANDW・SATO Dev Hub・Universal AI Monitorは実画面を掲載しています。画像を押すと拡大できます。UAMは合成データによるローカルデモ画面です。その他の作品は実画面受領後に順次追加します。</p>
     </section>
 
     <section class="section container" id="expertise" aria-labelledby="expertiseTitle">
