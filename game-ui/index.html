@@ -174,6 +174,14 @@
 .pending-code{font:800 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.13em;color:var(--cyan);padding:8px 10px;border:1px solid rgba(112,240,255,.18);margin-top:5px}
 @media(max-width:560px){.card-preview.screenshot-preview{padding:8px}.screenshot-pair{gap:8px}.screenshot-index{font-size:9px;top:6px;left:6px}.screenshot-caption{font-size:11px;bottom:8px;left:6px;right:6px}.pending-shell{gap:7px}}
 
+
+/* Screenshot display for ANDW, SATO Dev Hub and Universal AI Monitor */
+.screenshot-single{grid-template-columns:minmax(0,1fr)}
+.screenshot-single .screenshot-shot img{object-fit:contain;object-position:center;background:#07101b}
+.hub-shot .screenshot-shot img{object-fit:cover;object-position:top center}
+.andw-shot .screenshot-shot img,.uam-shot .screenshot-shot img{object-fit:contain;object-position:center;background:#07101b}
+@media(max-width:600px){.andw-shot{grid-template-columns:1fr;grid-template-rows:repeat(2,minmax(0,1fr));gap:8px}.card-preview:has(.andw-shot){height:380px}.screenshot-caption{font-size:11px}}
+
 </style>
 </head>
 <body>
@@ -235,7 +243,7 @@
         <div class="hero-tags"><span>BUSINESS APPS</span><span>AI WORKFLOWS</span><span>BROWSER EXTENSIONS</span><span>PRODUCT DESIGN</span></div>
         <div class="hero-telemetry">
           <div class="telemetry"><span><i>PUBLIC PRODUCTS</i><i>01</i></span><b class="count" data-value="3">3</b><small>公開デモ・ストア掲載</small></div>
-          <div class="telemetry"><span><i>PROJECTS</i><i>02</i></span><b class="count" data-value="9">9</b><small>分野横断の制作実績</small></div>
+          <div class="telemetry"><span><i>PROJECTS</i><i>02</i></span><b class="count" data-value="10">10</b><small>分野横断の制作実績</small></div>
           <div class="telemetry"><span><i>WORK STYLE</i><i>03</i></span><b>REMOTE</b><small>日本国内・フルリモート</small></div>
         </div>
       </div>
@@ -299,11 +307,11 @@
         <p>公開中のアプリから開発・検証中のツールまで。<br>目的、技術、現在の開発段階を整理して掲載しています。</p>
       </div>
       <div class="project-explorer reveal" aria-label="プロジェクト検索と絞り込み">
-        <div class="filter-label-row"><span>PROJECT CATEGORY <small>分野から探す</small></span><span class="project-result-count" id="projectResultCount" aria-live="polite">9 PROJECTS</span></div>
+        <div class="filter-label-row"><span>PROJECT CATEGORY <small>分野から探す</small></span><span class="project-result-count" id="projectResultCount" aria-live="polite">10 PROJECTS</span></div>
         <div class="filters" role="group" aria-label="プロジェクトカテゴリ">
-          <button type="button" class="filter category-filter active" data-filter-category="all" aria-pressed="true">すべて <small>09</small></button>
+          <button type="button" class="filter category-filter active" data-filter-category="all" aria-pressed="true">すべて <small>10</small></button>
           <button type="button" class="filter category-filter" data-filter-category="business" aria-pressed="false">業務システム <small>02</small></button>
-          <button type="button" class="filter category-filter" data-filter-category="ai" aria-pressed="false">AI・開発支援 <small>02</small></button>
+          <button type="button" class="filter category-filter" data-filter-category="ai" aria-pressed="false">AI・開発支援 <small>03</small></button>
           <button type="button" class="filter category-filter" data-filter-category="extension" aria-pressed="false">Chrome拡張 <small>03</small></button>
           <button type="button" class="filter category-filter" data-filter-category="product" aria-pressed="false">個人プロダクト <small>02</small></button>
         </div>
@@ -348,25 +356,31 @@
         </article>
         <article class="card project-card large reveal expandable-card" data-category="ai" data-status="build" data-project="07">
           <div class="card-top"><span class="card-id">/ 07 · AI・開発支援</span><span class="card-status"><i class="status-dot build"></i>開発中</span></div>
-          <div class="card-preview screenshot-pending" aria-label="Universal AI Monitorのスクリーンショットは準備中"><div class="pending-shell"><div class="pending-mark" aria-hidden="true">◇</div><div class="pending-title">Universal AI Monitor</div><div class="pending-message">実際のスクリーンショットを準備中です</div><div class="pending-code">SCREENSHOT PENDING</div></div></div>
-          <div class="card-body"><div class="card-copy"><p class="card-type">MONITORING / AI WORKFLOW</p><h3>Universal AI Monitor</h3><p class="project-lead">AI運用の見落としを、監視の仕組みで減らす。</p><p>AIエージェントや自動処理の欠報・期限超過・未回答を見つけ、必要な対応につなげることを目指す監視基盤です。</p><div class="tags"><span>Monitoring</span><span>Webhook</span><span>Cloudflare</span><span>Operations</span></div></div><div class="card-actions"><button type="button" class="detail-toggle" aria-expanded="false" aria-controls="detail-07"><span class="toggle-open">DETAIL</span><span class="toggle-close">CLOSE</span></button></div></div>
-          <div class="card-detail" id="detail-07"><div class="detail-grid"><div class="detail-block"><span>GOAL / 解決したい課題</span><b>複数の自動処理を動かしたとき、失敗や停滞を見逃さないための状態把握を支援する。</b></div><div class="detail-block"><span>CURRENT STAGE / 現在の状況</span><b>ローカル検証とStaging準備を進行中。Remote監視の常時稼働・本番運用は未実施です。</b></div></div><div class="detail-note"><span class="project-no-link">一般公開前のためリンクはありません</span></div></div>
+          <div class="card-preview targeted screenshot-preview" aria-label="実際のアプリ画面1枚を掲載"><div class="screenshot-pair screenshot-single uam-shot"><a class="screenshot-shot" href="assets/projects/uam-local-demo-dashboard.webp" target="_blank" rel="noopener noreferrer" aria-label="Universal AI Monitor 合成データを使用したローカルデモダッシュボードを原寸で開く"><img src="assets/projects/uam-local-demo-dashboard.webp" alt="Universal AI Monitor 合成データを使用したローカルデモダッシュボード" loading="lazy" decoding="async"><span class="screenshot-index">SCREEN 01</span><span class="screenshot-caption">監視ダッシュボード（合成デモ） <span aria-hidden="true">↗</span></span></a></div></div>
+          <div class="card-body"><div class="card-copy"><p class="card-type">MONITORING / AI WORKFLOW</p><h3>Universal AI Monitor</h3><p class="project-lead">AI運用の見落としを、監視の仕組みで減らす。</p><p>AIエージェントや自動処理の欠報・期限超過・状態変化を検知し、必要な対応へつなぐ監視基盤。掲載画面は合成データを使ったローカルデモです。</p><div class="tags"><span>Monitoring</span><span>Webhook</span><span>Cloudflare</span><span>Operations</span></div></div><div class="card-actions"><button type="button" class="detail-toggle" aria-expanded="false" aria-controls="detail-07"><span class="toggle-open">DETAIL</span><span class="toggle-close">CLOSE</span></button></div></div>
+          <div class="card-detail" id="detail-07"><div class="detail-grid"><div class="detail-block"><span>GOAL / 解決したい課題</span><b>複数の自動処理を動かしたとき、失敗や停滞を見逃さないための状態把握を支援する。</b></div><div class="detail-block"><span>CURRENT STAGE / 現在の状況</span><b>合成データによるローカルデモを確認済み。Staging準備中で、実データの常時監視・本番運用は未実施です。</b></div></div><div class="detail-note"><span class="project-no-link">一般公開前のためリンクはありません</span></div></div>
         </article>
-        <article class="card project-card large reveal expandable-card" data-category="product" data-status="build" data-project="08">
-          <div class="card-top"><span class="card-id">/ 08 · 個人プロダクト</span><span class="card-status"><i class="status-dot build"></i>開発中</span></div>
-          <div class="card-preview screenshot-pending" aria-label="ANDWのスクリーンショットは準備中"><div class="pending-shell"><div class="pending-mark" aria-hidden="true">◇</div><div class="pending-title">ANDW</div><div class="pending-message">実際のスクリーンショットを準備中です</div><div class="pending-code">SCREENSHOT PENDING</div></div></div>
-          <div class="card-body"><div class="card-copy"><p class="card-type">DESKTOP / DOCUMENT VIEWER</p><h3>ANDW</h3><p class="project-lead">仕様書を読む時間まで、心地よい体験に。</p><p>AIが生成したMarkdownの要件定義書・仕様書を、アプリのような画面で読みやすく表示するドキュメント特化ビューア。</p><div class="tags"><span>Electron</span><span>Markdown</span><span>Mermaid</span><span>UI Motion</span></div></div><div class="card-actions"><button type="button" class="detail-toggle" aria-expanded="false" aria-controls="detail-08"><span class="toggle-open">DETAIL</span><span class="toggle-close">CLOSE</span></button></div></div>
-          <div class="card-detail" id="detail-08"><div class="detail-grid"><div class="detail-block"><span>GOAL / 解決したい課題</span><b>情報量の多い設計ドキュメントでも、内容を追いやすく、見た目も整った閲覧環境を作る。</b></div><div class="detail-block"><span>CURRENT STAGE / 現在の状況</span><b>デスクトップ版を開発中。テーマやPDF出力などの体験を磨いています。</b></div></div><div class="detail-note"><span class="project-no-link">一般公開前のためリンクはありません</span></div></div>
+        <article class="card project-card large reveal expandable-card" data-category="ai" data-status="build" data-project="08">
+ <div class="card-top"><span class="card-id">/ 08 · AI・開発支援</span><span class="card-status"><i class="status-dot build"></i>開発中</span></div>
+ <div class="card-preview targeted screenshot-preview" aria-label="実際のアプリ画面1枚を掲載"><div class="screenshot-pair screenshot-single hub-shot"><a class="screenshot-shot" href="assets/projects/sato-dev-hub-dashboard.webp" target="_blank" rel="noopener noreferrer" aria-label="SATO Dev Hubの開発ダッシュボード。プロジェクト登録や進行状況を表示を原寸で開く"><img src="assets/projects/sato-dev-hub-dashboard.webp" alt="SATO Dev Hubの開発ダッシュボード。プロジェクト登録や進行状況を表示" loading="lazy" decoding="async"><span class="screenshot-index">SCREEN 01</span><span class="screenshot-caption">開発ダッシュボード <span aria-hidden="true">↗</span></span></a></div></div>
+ <div class="card-body"><div class="card-copy"><p class="card-type">DEVELOPER TOOL / PROJECT OPERATIONS</p><h3>SATO Dev Hub</h3><p class="project-lead">開発の現在地と、次に取る行動をひとつに。</p><p>複数の開発プロジェクトの進捗、判断根拠、停止・ブロック理由、次のアクションを整理するダッシュボード。状況確認と開発判断を支えるためのツールです。</p><div class="tags"><span>React</span><span>Cloudflare</span><span>Project Tracking</span><span>Issue Management</span></div></div><div class="card-actions"><button type="button" class="detail-toggle" aria-expanded="false" aria-controls="detail-08"><span class="toggle-open">DETAIL</span><span class="toggle-close">CLOSE</span></button></div></div>
+ <div class="card-detail" id="detail-08"><div class="detail-grid"><div class="detail-block"><span>GOAL / 解決したい課題</span><b>複数案件の進捗・停止理由・次の作業が分散している状態を減らし、開発判断に必要な情報をまとめる。</b></div><div class="detail-block"><span>CURRENT STAGE / 現在の状況</span><b>プロジェクト登録・編集、状態・次アクション等を扱うダッシュボードを開発・検証中。外部同期や自動連携は整備段階です。</b></div></div><div class="detail-note"><span class="project-no-link">一般公開前のためリンクはありません</span></div></div>
+ </article>
+        <article class="card project-card large reveal expandable-card" data-category="product" data-status="build" data-project="09">
+          <div class="card-top"><span class="card-id">/ 09 · 個人プロダクト</span><span class="card-status"><i class="status-dot build"></i>開発中</span></div>
+          <div class="card-preview targeted screenshot-preview" aria-label="実際のアプリ画面2枚を掲載"><div class="screenshot-pair andw-shot"><a class="screenshot-shot" href="assets/projects/andw-reader-dark.webp" target="_blank" rel="noopener noreferrer" aria-label="ANDW ダークテーマで表示した架空サンプル仕様書を原寸で開く"><img src="assets/projects/andw-reader-dark.webp" alt="ANDW ダークテーマで表示した架空サンプル仕様書" loading="lazy" decoding="async"><span class="screenshot-index">SCREEN 01</span><span class="screenshot-caption">仕様書ビューア / ダーク <span aria-hidden="true">↗</span></span></a><a class="screenshot-shot" href="assets/projects/andw-diagram-light.webp" target="_blank" rel="noopener noreferrer" aria-label="ANDW ライトテーマの架空サンプルのフロー図を原寸で開く"><img src="assets/projects/andw-diagram-light.webp" alt="ANDW ライトテーマの架空サンプルのフロー図" loading="lazy" decoding="async"><span class="screenshot-index">SCREEN 02</span><span class="screenshot-caption">フロー図 / ライト <span aria-hidden="true">↗</span></span></a></div></div>
+          <div class="card-body"><div class="card-copy"><p class="card-type">DESKTOP / DOCUMENT VIEWER</p><h3>ANDW</h3><p class="project-lead">仕様書を読む時間まで、心地よい体験に。</p><p>AIが生成したMarkdownの要件定義書・仕様書を、アプリのような画面で読みやすく表示するドキュメント特化ビューア。</p><div class="tags"><span>Electron</span><span>Markdown</span><span>Mermaid</span><span>UI Motion</span></div></div><div class="card-actions"><button type="button" class="detail-toggle" aria-expanded="false" aria-controls="detail-09"><span class="toggle-open">DETAIL</span><span class="toggle-close">CLOSE</span></button></div></div>
+          <div class="card-detail" id="detail-09"><div class="detail-grid"><div class="detail-block"><span>GOAL / 解決したい課題</span><b>情報量の多い設計ドキュメントでも、内容を追いやすく、見た目も整った閲覧環境を作る。</b></div><div class="detail-block"><span>CURRENT STAGE / 現在の状況</span><b>デスクトップ版を開発中。テーマやPDF出力などの体験を磨いています。</b></div></div><div class="detail-note"><span class="project-no-link">一般公開前のためリンクはありません</span></div></div>
         </article>
-        <article class="card project-card large reveal expandable-card" data-category="product" data-status="spec" data-project="09">
-          <div class="card-top"><span class="card-id">/ 09 · 個人プロダクト</span><span class="card-status"><i class="status-dot spec"></i>仕様策定中</span></div>
+        <article class="card project-card large reveal expandable-card" data-category="product" data-status="spec" data-project="10">
+          <div class="card-top"><span class="card-id">/ 10 · 個人プロダクト</span><span class="card-status"><i class="status-dot spec"></i>仕様策定中</span></div>
           <div class="card-preview screenshot-pending" aria-label="I&#39;m done!のスクリーンショットは準備中"><div class="pending-shell"><div class="pending-mark" aria-hidden="true">◇</div><div class="pending-title">I&#39;m done!</div><div class="pending-message">実際のスクリーンショットを準備中です</div><div class="pending-code">SCREENSHOT PENDING</div></div></div>
-          <div class="card-body"><div class="card-copy"><p class="card-type">PRODUCT DESIGN / FAMILY</p><h3>I&#x27;m done!</h3><p class="project-lead">家族の「お願い」と「できた」を、前向きにつなぐ。</p><p>家族内のタスク依頼、完了報告、承認・差し戻し、繰り返し予定などをひとつにまとめるコミュニケーションツールの企画です。</p><div class="tags"><span>要件定義</span><span>タスク管理</span><span>家族向け</span><span>UX設計</span></div></div><div class="card-actions"><button type="button" class="detail-toggle" aria-expanded="false" aria-controls="detail-09"><span class="toggle-open">DETAIL</span><span class="toggle-close">CLOSE</span></button></div></div>
-          <div class="card-detail" id="detail-09"><div class="detail-grid"><div class="detail-block"><span>GOAL / 解決したい課題</span><b>家族間の頼みごとや進捗確認を、曖昧な口約束ではなく、共有しやすい仕組みにする。</b></div><div class="detail-block"><span>CURRENT STAGE / 現在の状況</span><b>ヒアリング・仕様策定中。タスクの終了条件や承認フローなどを整理しており、未確定事項も残っています。</b></div></div><div class="detail-note"><span class="project-no-link">一般公開前のためリンクはありません</span></div></div>
+          <div class="card-body"><div class="card-copy"><p class="card-type">PRODUCT DESIGN / FAMILY</p><h3>I&#x27;m done!</h3><p class="project-lead">家族の「お願い」と「できた」を、前向きにつなぐ。</p><p>家族内のタスク依頼、完了報告、承認・差し戻し、繰り返し予定などをひとつにまとめるコミュニケーションツールの企画です。</p><div class="tags"><span>要件定義</span><span>タスク管理</span><span>家族向け</span><span>UX設計</span></div></div><div class="card-actions"><button type="button" class="detail-toggle" aria-expanded="false" aria-controls="detail-10"><span class="toggle-open">DETAIL</span><span class="toggle-close">CLOSE</span></button></div></div>
+          <div class="card-detail" id="detail-10"><div class="detail-grid"><div class="detail-block"><span>GOAL / 解決したい課題</span><b>家族間の頼みごとや進捗確認を、曖昧な口約束ではなく、共有しやすい仕組みにする。</b></div><div class="detail-block"><span>CURRENT STAGE / 現在の状況</span><b>ヒアリング・仕様策定中。タスクの終了条件や承認フローなどを整理しており、未確定事項も残っています。</b></div></div><div class="detail-note"><span class="project-no-link">一般公開前のためリンクはありません</span></div></div>
         </article>
       </div>
       <p class="project-empty" id="projectEmpty" hidden>この条件に一致するプロジェクトはありません。カテゴリか開発状況を変更してください。</p>
-      <p class="work-note reveal">※ 勤怠管理・見積請求は実際のアプリ画面を掲載しています。画像を押すと拡大表示できます。その他の作品は実画面の受領後に順次追加します。</p>
+      <p class="work-note reveal">※ 勤怠管理・見積請求・ANDW・SATO Dev Hub・Universal AI Monitorは実画面を掲載しています。画像を押すと拡大できます。UAMは合成データによるローカルデモ画面です。その他の作品は実画面受領後に順次追加します。</p>
     </section>
 
     <section class="section container" id="expertise" aria-labelledby="expertiseTitle">
